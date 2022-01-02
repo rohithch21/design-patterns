@@ -27,7 +27,7 @@ class Observer{ // Abstract Class
         // void setUUID(){
         //         this->uuid = printRandomString(3);
         // }
-        void update(float t, float ws, float p){
+        virtual void update(float t, float ws, float p){
             this->temperature = t;
             this->windSpeed = ws;
             this->pressure = p;
@@ -38,9 +38,6 @@ class Observer{ // Abstract Class
 
 class ObserverUI : public Observer{
         public:
-        // ObserverUI : Observer{
-        //     setUUID();
-        // }
         void display(){
             cout << "Temperature : " << this->temperature << endl;
             cout << "Wind Speed  : " << this->windSpeed << endl;
@@ -49,31 +46,30 @@ class ObserverUI : public Observer{
 };
 
 class Alert : public Observer{
-    // Alert : Observer{
-    //         setUUID();
-    //     }
     public:
     void alert(string msg){
-        cout << "ALERT : " + msg << endl;
+        if(this->pressure > 100){
+            cout << "ALERT : " + msg << endl;
+            cout << "Pressure = " << this->pressure << endl;
+        }
     }
 };
 
 class Logger : public Observer{
-    // Logger : Observer{
-    //         setUUID();
-    //     }
     public:
     void log(string msg){
         cout << "LOG : " + msg << endl;
+        cout << "Pressure = " << this->pressure << endl;
+
     }
 };
 
 class WeatherStation{
     protected:
         float temperature, windSpeed, pressure;
-        vector<Observer> observers;
+        vector<Observer*> observers;
     public:
-        void addObserver(Observer o){
+        void addObserver(Observer* o){
             observers.push_back(o);
             cout << "Added Observer\n";
         }
@@ -88,10 +84,10 @@ class WeatherStation{
         // }
         void notifyObservers(){
             Observer o;
-            vector<Observer>:: iterator itr;
+            vector<Observer*>:: iterator itr;
             for(itr = observers.begin(); itr != observers.end(); itr++){
-                o = *itr;
-                o.update(temperature,windSpeed,pressure);
+                // o = *itr;
+                (*itr)->update(temperature,windSpeed,pressure); // itr is a pointer to a pointer to vector elements
             }
              
         }
@@ -114,15 +110,19 @@ int main(){
     Alert alerter;
     ObserverUI ui;
     Logger logger;
-    station.addObserver(ui);
-    station.addObserver(alerter);
-    station.addObserver(logger);
+    string status;
+    station.addObserver(&ui);
+    station.addObserver(&alerter);
+    station.addObserver(&logger);
     station.setValue(temprtr, windSpeed, pressure);
 
+    status = "Current Pressure";
     ui.display();
-    station.setValue(temprtr+1, windSpeed+2, pressure+3);
+    alerter.alert(status);
+    logger.log(status);
+    station.setValue(temprtr+1, windSpeed+2, pressure+100);
+    status = "Pressure increasing";
     ui.display();
-    string status = "Pressure increasing";
     alerter.alert(status);
     logger.log(status);
 
