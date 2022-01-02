@@ -73,15 +73,15 @@ class WeatherStation{
             observers.push_back(o);
             cout << "Added Observer\n";
         }
-        // void removeObserver(Observer o){
-        //     vector<Observer>::iterator itr1;
-        //     for(itr1 = observers.begin(); itr1 != observers.end(); itr1++){
-        //         if(o == *itr1){
-        //             observers.erase(itr1);
-        //             break;
-        //         }
-        //     }
-        // }
+        void removeObserver(Observer* o){
+            vector<Observer*>::iterator itr1;
+            for(itr1 = observers.begin(); itr1 != observers.end(); itr1++){
+                if(o == *itr1){ // if pointer passed == pointer location saved in vector
+                    observers.erase(itr1);
+                    break;
+                }
+            }
+        }
         void notifyObservers(){
             Observer o;
             vector<Observer*>:: iterator itr;
@@ -125,6 +125,9 @@ int main(){
     ui.display();
     alerter.alert(status);
     logger.log(status);
+    station.removeObserver(&ui);
+    station.setValue(temprtr+2, windSpeed+3, pressure+4);
+    ui.display();
 
 
 }
